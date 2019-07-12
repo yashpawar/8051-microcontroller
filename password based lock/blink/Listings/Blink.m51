@@ -1,0 +1,94 @@
+BL51 BANKED LINKER/LOCATER V6.22.2.0                                                    11/30/2018  11:17:26  PAGE 1
+
+
+BL51 BANKED LINKER/LOCATER V6.22.2.0, INVOKED BY:
+C:\KEIL_V5\C51\BIN\BL51.EXE .\Objects\Blink.obj TO .\Objects\Blink PRINT (.\Listings\Blink.m51)
+
+
+MEMORY MODEL: SMALL
+
+
+INPUT MODULES INCLUDED:
+  .\Objects\Blink.obj (BLINK)
+  C:\KEIL_V5\C51\LIB\C51S.LIB (?C_STARTUP)
+
+
+LINK MAP OF MODULE:  .\Objects\Blink (BLINK)
+
+
+            TYPE    BASE      LENGTH    RELOCATION   SEGMENT NAME
+            -----------------------------------------------------
+
+            * * * * * * *   D A T A   M E M O R Y   * * * * * * *
+            REG     0000H     0008H     ABSOLUTE     "REG BANK 0"
+            IDATA   0008H     0001H     UNIT         ?STACK
+
+            * * * * * * *   C O D E   M E M O R Y   * * * * * * *
+            CODE    0000H     0003H     ABSOLUTE     
+                    0003H     07FDH                  *** GAP ***
+            CODE    0800H     0020H     UNIT         ?PR?_DELAY?BLINK
+            CODE    0820H     0019H     UNIT         ?PR?MAIN?BLINK
+            CODE    0839H     000CH     UNIT         ?C_C51STARTUP
+
+
+
+OVERLAY MAP OF MODULE:   .\Objects\Blink (BLINK)
+
+
+SEGMENT
+  +--> CALLED SEGMENT
+---------------------
+?C_C51STARTUP
+  +--> ?PR?MAIN?BLINK
+
+?PR?MAIN?BLINK
+  +--> ?PR?_DELAY?BLINK
+
+
+
+SYMBOL TABLE OF MODULE:  .\Objects\Blink (BLINK)
+
+  VALUE           TYPE          NAME
+  ----------------------------------
+
+  -------         MODULE        BLINK
+  C:0000H         SYMBOL        _ICE_DUMMY_
+  D:0090H         PUBLIC        P1
+  C:0800H         PUBLIC        _delay
+  C:0820H         PUBLIC        main
+  -------         PROC          _DELAY
+  D:0006H         SYMBOL        d
+  -------         DO            
+BL51 BANKED LINKER/LOCATER V6.22.2.0                                                  11/30/2018  11:17:26  PAGE 2
+
+
+  D:0004H         SYMBOL        i
+  -------         ENDDO         
+  C:0800H         LINE#         2
+  C:0800H         LINE#         3
+  C:0800H         LINE#         5
+  C:080BH         LINE#         6
+  C:080BH         LINE#         7
+  C:0818H         LINE#         8
+  C:081FH         LINE#         9
+  -------         ENDPROC       _DELAY
+  -------         PROC          MAIN
+  C:0820H         LINE#         10
+  C:0820H         LINE#         11
+  C:0820H         LINE#         12
+  C:0823H         LINE#         13
+  C:0823H         LINE#         14
+  C:0823H         LINE#         15
+  C:0826H         LINE#         16
+  C:082DH         LINE#         17
+  C:0830H         LINE#         18
+  C:0837H         LINE#         19
+  -------         ENDPROC       MAIN
+  -------         ENDMOD        BLINK
+
+******************************************************************************
+* RESTRICTED VERSION WITH 0800H BYTE CODE SIZE LIMIT; USED: 0039H BYTE ( 2%) *
+******************************************************************************
+
+Program Size: data=9.0 xdata=0 code=72
+LINK/LOCATE RUN COMPLETE.  0 WARNING(S),  0 ERROR(S)

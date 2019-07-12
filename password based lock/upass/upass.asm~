@@ -1,0 +1,111 @@
+
+pass:db 1h,2h,3h,4h
+keypad:db 01h,02h,03h,0ah,04h,05h,06h,0bh,07h,08h,09h,0ch,0eh,00h,0fh,0dh
+
+keyport equ p3
+ledport equ p1
+outpin equ p2.0
+
+org 0000h
+
+l8:
+setb outpin
+;
+mov ledport,#0ffh
+mov r6,#01h;enable led lights
+;
+mov r0,#30h
+mov r5,#04h;length of password
+l4:
+mov r2,#0feh
+mov r3,#04h;row
+mov keyport,#0f0h
+l5:
+mov a,keyport
+cjne a,#0f0h,l3
+sjmp l5
+
+l3:
+mov r4,#04h;column
+mov keyport,r2
+mov a,keyport
+l2:
+setb c
+rlc a
+jnc l1
+djnz r4,l2
+mov a,r2
+rl a
+mov r2,a
+djnz r3,l3
+l1:
+mov a,#04h
+clr c
+subb a,r3
+mov b,#04h
+mul ab
+add a,r4
+dec a
+mov dptr,#keypad
+movc a,@a+dptr
+mov @r0,a
+inc r0
+
+;program for led
+mov a,r6
+cpl a
+mov ledport,a
+
+mov a,r6
+rl a
+inc a
+mov r6,a
+
+;add delay here(between presses)
+acall buttondelay
+
+
+djnz r5,l4
+
+
+;checking password
+l6:
+mov r0,#30h
+mov r5,#04h
+mov dptr,#pass
+l7:
+clr a
+movc a,@a+dptr
+clr c
+subb a,@r0
+jnz l9
+inc r0
+inc dptr
+djnz r5,l7
+clr outpin
+
+
+;add delay(glowing time for correct code)
+acall glowdelay
+
+
+
+l9:sjmp l8
+
+
+;subroutines
+
+buttondelay:
+mov a,#020h
+djnz a,$
+ret
+
+glowdelay:
+
+mov a,#030h
+djnz a,$
+ret
+;possible improvemnts
+;dispaly on lcd
+;delay using counter
+end

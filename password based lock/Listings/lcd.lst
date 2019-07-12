@@ -1,0 +1,324 @@
+A51 MACRO ASSEMBLER  LCD                                                                  12/01/2018 06:49:30 PAGE     1
+
+
+MACRO ASSEMBLER A51 V8.2.7.0
+OBJECT MODULE PLACED IN .\Objects\lcd.obj
+ASSEMBLER INVOKED BY: C:\Keil_v5\C51\BIN\A51.EXE lcd.a51 SET(SMALL) DEBUG PRINT(.\Listings\lcd.lst) OBJECT(.\Objects\lcd
+                      .obj) EP
+
+LOC  OBJ            LINE     SOURCE
+
+  00A0                 1     keyport equ p2
+  0090                 2     lcdport equ p1
+  00B0                 3     rs equ p3.0
+  00B1                 4     rw equ p3.1
+  00B2                 5     e equ p3.2
+  0040                 6     un equ 40h
+  0041                 7     ln equ 41h
+  00B4                 8     output equ p3.4
+                       9     ;registers r0,r2,r3,r4,r5,r6 are used
+                      10     
+                      11     
+                      12     
+                      13     
+0000                  14     org 0000h
+                      15     ;intialize lcd
+0000 758901           16     mov tmod,#01h
+0003 1134             17     acall lcd_init
+0005                  18     start:
+0005 115D             19     acall clrscr
+0007 1158             20     acall line1
+0009 90012E           21     mov dptr,#text1
+000C 1149             22     acall lcd_out
+000E 120053           23     lcall line2
+0011 1200E7           24     lcall askpass
+0014 111D             25     acall checkpassword
+0016 7E46             26     mov r6,#46h
+0018 1200C1           27     lcall delay1
+001B 80E8             28     sjmp start
+                      29     
+                      30     
+                      31     ;checking password
+001D                  32     checkpassword:
+001D 7830             33     mov r0,#30h
+001F 7D04             34     mov r5,#04h
+0021 90012A           35     mov dptr,#pass
+0024                  36     checknxt:
+0024 E4               37     clr a
+0025 93               38     movc a,@a+dptr
+0026 C3               39     clr c
+0027 96               40     subb a,@r0
+0028 7007             41     jnz pre
+002A 08               42     inc r0
+002B A3               43     inc dptr
+002C DDF6             44     djnz r5,checknxt
+                      45     ;call subroutine that displays password accepted
+002E 11D3             46     acall pa
+0030 22               47     ret
+0031                  48     pre:;call subroutine that displays password rejected
+0031 11DD             49     acall pr
+0033 22               50     ret
+                      51     
+0034                  52     lcd_init:
+0034 7420             53     mov a,#20h;
+0036 1162             54     acall cmd_write
+0038 7428             55     mov a,#28h;
+003A 1162             56     acall cmd_write
+003C 740C             57     mov a,#0Ch;
+A51 MACRO ASSEMBLER  LCD                                                                  12/01/2018 06:49:30 PAGE     2
+
+003E 1162             58     acall cmd_write
+0040 115D             59     acall clrscr
+0042 7406             60     mov a,#06h;
+0044 1162             61     acall cmd_write
+0046 1158             62     acall line1
+0048 22               63     ret
+                      64     
+0049                  65     lcd_out:
+0049 E4               66     clr a
+004A 93               67     movc a,@a+dptr
+004B 6005             68     jz exit
+004D A3               69     inc dptr
+004E 1181             70     acall data_write
+0050 80F7             71     sjmp lcd_out
+0052 22               72     exit:ret
+                      73     
+0053                  74     line2:
+0053 74C0             75     mov a,#0c0h;force cursor to second line
+0055 1162             76     acall cmd_write
+0057 22               77     ret
+                      78     
+0058                  79     line1:
+0058 7480             80     mov a,#80h;force cursor to first line
+005A 1162             81     acall cmd_write
+005C 22               82     ret
+                      83     
+005D                  84     clrscr:
+005D 7401             85     mov a,#01h;clear display
+005F 1162             86     acall cmd_write
+0061 22               87     ret
+                      88     
+0062                  89     cmd_write:
+0062 11A0             90     acall sep
+0064 C2B0             91     clr rs
+0066 C2B1             92     clr rw
+0068 E540             93     mov a,un
+006A 11AB             94     acall move
+006C D2B2             95     setb e
+006E 11B1             96     acall delay
+0070 C2B2             97     clr e
+0072 11B1             98     acall delay
+0074 E541             99     mov a,ln
+0076 11AB            100     acall move
+0078 D2B2            101     setb e
+007A 11B1            102     acall delay
+007C C2B2            103     clr e
+007E 11B1            104     acall delay
+0080 22              105     ret
+                     106     
+0081                 107     data_write:
+0081 11A0            108     acall sep
+0083 D2B0            109     setb rs
+0085 C2B1            110     clr rw
+0087 E540            111     mov a,un
+0089 11AB            112     acall move
+008B D2B2            113     setb e
+008D 11B1            114     acall delay
+008F C2B2            115     clr e
+0091 11B1            116     acall delay
+0093 E541            117     mov a,ln
+0095 11AB            118     acall move
+0097 D2B2            119     setb e
+0099 11B1            120     acall delay
+009B C2B2            121     clr e
+009D 11B1            122     acall delay
+009F 22              123     ret
+A51 MACRO ASSEMBLER  LCD                                                                  12/01/2018 06:49:30 PAGE     3
+
+00A0                 124     sep:
+00A0 F540            125     MOV un,A        
+00A2 5340F0          126     ANL un,#0F0H 
+00A5 C4              127     SWAP A
+00A6 54F0            128     ANL A,#0F0H   
+00A8 F541            129     MOV ln,A        
+00AA 22              130     RET            
+                     131     
+00AB                 132     move:
+00AB 53900F          133     anl lcdport,#0Fh
+00AE 4290            134     orl lcdport,A
+00B0 22              135     ret
+                     136        
+00B1                 137     delay:
+00B1 758CED          138     mov th0,#0edh
+00B4 758A00          139     mov tl0,#00h
+00B7 D28C            140     setb tr0
+00B9 308DFD          141     jnb tf0,$
+00BC C28C            142     clr tr0
+00BE C28D            143     clr tf0
+00C0 22              144     ret
+                     145     
+00C1                 146     delay1:
+00C1 758C00          147     mov th0,#00h
+00C4 758A00          148     mov tl0,#00h
+00C7 D28C            149     setb tr0
+00C9 308DFD          150     jnb tf0,$
+00CC C28C            151     clr tr0
+00CE C28D            152     clr tf0
+00D0 DEEF            153     djnz r6,delay1
+00D2 22              154     ret
+                     155     
+00D3                 156     pa:
+00D3 115D            157     acall clrscr
+00D5 1158            158     acall line1
+00D7 900137          159     mov dptr,#text2
+00DA 1149            160     acall lcd_out
+00DC 22              161     ret
+                     162     
+00DD                 163     pr:
+00DD 115D            164     acall clrscr
+00DF 1158            165     acall line1
+00E1 900140          166     mov dptr,#text3
+00E4 1149            167     acall lcd_out
+00E6 22              168     ret
+                     169     
+00E7                 170     askpass:
+00E7 7830            171     mov r0,#30h;store passwords from location 30h onwards
+00E9 7D04            172     mov r5,#04h;length of password
+                     173     
+00EB                 174     detectpress:;wait until keypress is detected
+00EB 75A0F0          175     mov keyport,#0f0h;set all columns as input and all rows as 0
+00EE E5A0            176     mov a,keyport
+00F0 B4F002          177     cjne a,#0f0h,pressconf
+00F3 80F6            178     sjmp detectpress
+                     179     
+                     180     
+00F5                 181     pressconf:
+00F5 7AFE            182     mov r2,#0feh;check row(enter 0 in one row) first row is checked first
+00F7 7B04            183     mov r3,#04h;no of rows
+                     184     
+00F9                 185     nextrow:
+00F9 7C04            186     mov r4,#04h;no of columns
+00FB 8AA0            187     mov keyport,r2;check each row
+00FD E5A0            188     mov a,keyport
+                     189     
+A51 MACRO ASSEMBLER  LCD                                                                  12/01/2018 06:49:30 PAGE     4
+
+00FF                 190     nextcol:;check each column for each row
+00FF D3              191     setb c
+0100 33              192     rlc a
+0101 5007            193     jnc keyfound;check for 0 in all columns
+0103 DCFA            194     djnz r4,nextcol
+                     195     
+                     196     ;rotate 0 in r2 to check next row
+0105 EA              197     mov a,r2
+0106 23              198     rl a
+0107 FA              199     mov r2,a
+                     200     
+0108 DBEF            201     djnz r3,nextrow
+010A                 202     keyfound:
+010A 311B            203     acall keyidentify;key identified and hex value stored in A
+010C F6              204     mov @r0,a;store pressed key
+010D 08              205     inc r0
+                     206     
+                     207     ;lcd
+010E 742A            208     mov a,#'*'
+0110 120081          209     lcall data_write
+                     210     
+                     211     ;button press delay
+0113 7E07            212     mov r6,#07h
+0115 1200C1          213     lcall delay1
+                     214     
+                     215     
+0118 DDD1            216     djnz r5,detectpress;check next key
+011A 22              217     ret
+                     218     
+011B                 219     keyidentify:
+011B 7404            220     mov a,#04h
+011D C3              221     clr c
+011E 9B              222     subb a,r3
+011F 75F004          223     mov b,#04h
+0122 A4              224     mul ab
+0123 2C              225     add a,r4
+0124 14              226     dec a
+0125 900148          227     mov dptr,#keypad
+0128 93              228     movc a,@a+dptr
+0129 22              229     ret
+                     230     
+                     231     
+012A 01020304        232     pass:db 1h,2h,3h,4h
+                     233     
+012E 50617373        234     text1: db 'Password',0
+0132 776F7264                
+0136 00                      
+0137 436F7272        235     text2: db 'Correct!',0
+013B 65637421                
+013F 00                      
+0140 4572726F        236     text3: db 'Error X',0
+0144 72205800                
+0148 0102030A        237     keypad:db 01h,02h,03h,0ah,04h,05h,06h,0bh,07h,08h,09h,0ch,0eh,00h,0fh,0dh
+014C 0405060B                
+0150 0708090C                
+0154 0E000F0D                
+                     238     
+                     239     end
+A51 MACRO ASSEMBLER  LCD                                                                  12/01/2018 06:49:30 PAGE     5
+
+SYMBOL TABLE LISTING
+------ ----- -------
+
+
+N A M E             T Y P E  V A L U E   ATTRIBUTES
+
+ASKPASS. . . . . .  C ADDR   00E7H   A   
+B. . . . . . . . .  D ADDR   00F0H   A   
+CHECKNXT . . . . .  C ADDR   0024H   A   
+CHECKPASSWORD. . .  C ADDR   001DH   A   
+CLRSCR . . . . . .  C ADDR   005DH   A   
+CMD_WRITE. . . . .  C ADDR   0062H   A   
+DATA_WRITE . . . .  C ADDR   0081H   A   
+DELAY. . . . . . .  C ADDR   00B1H   A   
+DELAY1 . . . . . .  C ADDR   00C1H   A   
+DETECTPRESS. . . .  C ADDR   00EBH   A   
+E. . . . . . . . .  B ADDR   00B0H.2 A   
+EXIT . . . . . . .  C ADDR   0052H   A   
+KEYFOUND . . . . .  C ADDR   010AH   A   
+KEYIDENTIFY. . . .  C ADDR   011BH   A   
+KEYPAD . . . . . .  C ADDR   0148H   A   
+KEYPORT. . . . . .  D ADDR   00A0H   A   
+LCDPORT. . . . . .  D ADDR   0090H   A   
+LCD_INIT . . . . .  C ADDR   0034H   A   
+LCD_OUT. . . . . .  C ADDR   0049H   A   
+LINE1. . . . . . .  C ADDR   0058H   A   
+LINE2. . . . . . .  C ADDR   0053H   A   
+LN . . . . . . . .  N NUMB   0041H   A   
+MOVE . . . . . . .  C ADDR   00ABH   A   
+NEXTCOL. . . . . .  C ADDR   00FFH   A   
+NEXTROW. . . . . .  C ADDR   00F9H   A   
+OUTPUT . . . . . .  B ADDR   00B0H.4 A   
+P1 . . . . . . . .  D ADDR   0090H   A   
+P2 . . . . . . . .  D ADDR   00A0H   A   
+P3 . . . . . . . .  D ADDR   00B0H   A   
+PA . . . . . . . .  C ADDR   00D3H   A   
+PASS . . . . . . .  C ADDR   012AH   A   
+PR . . . . . . . .  C ADDR   00DDH   A   
+PRE. . . . . . . .  C ADDR   0031H   A   
+PRESSCONF. . . . .  C ADDR   00F5H   A   
+RS . . . . . . . .  B ADDR   00B0H.0 A   
+RW . . . . . . . .  B ADDR   00B0H.1 A   
+SEP. . . . . . . .  C ADDR   00A0H   A   
+START. . . . . . .  C ADDR   0005H   A   
+TEXT1. . . . . . .  C ADDR   012EH   A   
+TEXT2. . . . . . .  C ADDR   0137H   A   
+TEXT3. . . . . . .  C ADDR   0140H   A   
+TF0. . . . . . . .  B ADDR   0088H.5 A   
+TH0. . . . . . . .  D ADDR   008CH   A   
+TL0. . . . . . . .  D ADDR   008AH   A   
+TMOD . . . . . . .  D ADDR   0089H   A   
+TR0. . . . . . . .  B ADDR   0088H.4 A   
+UN . . . . . . . .  N NUMB   0040H   A   
+
+
+REGISTER BANK(S) USED: 0 
+
+
+ASSEMBLY COMPLETE.  0 WARNING(S), 0 ERROR(S)

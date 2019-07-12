@@ -1,0 +1,57 @@
+;Simple LCD interfacing program with 8051 microcontroller
+;so we have three control pins to take care of.
+;so lets program using these 3 control pins.
+; P2.0 EQU RS
+; P2.1 EQU RW
+; P2.2 EQU E
+ORG 0000H    ;
+MOV A, #38H    ; INITIATE LCD(2 lines 5x7 matrix)
+ACALL COMMWRT    ;
+ACALL DELAY    ;
+
+MOV A, #0FH    ; DISPLAY ON CURSOR blink
+ACALL COMMWRT    ;
+ACALL DELAY    ;
+
+MOV A, #01H    ; CLEAR LCD
+ACALL COMMWRT    ;
+ACALL DELAY    ;
+
+MOV A, #81H    ; CURSOR AT LINE 1 POSITION 1
+ACALL COMMWRT    ;
+ACALL DELAY    ;
+AGAIN:
+MOV A, #48    ; SEND ASCII DATA
+ACALL DATAWRT    ;
+ACALL DELAY    ;
+
+
+SJMP AGAIN    ;
+
+COMMWRT:
+MOV P1, A    ;
+CLR P2.0    ; RS = 0 FOR COMMAND REGISTER
+CLR P2.1    ; R/W = 0 FOR WRITE
+SETB P2.2    ; E = 1 FOR HIGH PULSE
+ACALL DELAY    ;
+CLR P2.2    ; E = 0 FOR LOW PULSE
+RET
+
+DATAWRT:
+MOV P1, A    ;
+SETB P2.0    ; RS = 1 FOR DATA REGISTER
+CLR P2.1    ; R/W = 0 FOR WRITE
+SETB P2.2    ; E = 1 FOR HIGH PULSE
+ACALL DELAY    ;
+CLR P2.2    ; E = 0 FOR LOW PULSE
+RET
+
+DELAY:
+;MOV R3, #50H ;
+;BACK: 
+MOV R4, #01H ;
+HERE:
+DJNZ R4, HERE ;
+;DJNZ R3, BACK ;
+RET
+END
